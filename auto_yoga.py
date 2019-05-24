@@ -15,8 +15,8 @@ HEADERS = {"Accept": "application/json, text/plain, */*",
            "Content-Type": "application/json;charset=UTF-8",
            "APP_VERSION": "social_app_1.0"
            }
-USER_NAME = "bill.li@nexa-corp.com"
-PASSWORD = "shrinlee87885537"
+USER_NAME = ""
+PASSWORD = ""
 LOCATION = "262adc8f-bad9-435a-8d8a-8fde521d68eb"
 
 TARGETS = ["yoga", "瑜伽"]
