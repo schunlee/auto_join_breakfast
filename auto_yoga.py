@@ -15,9 +15,11 @@ HEADERS = {"Accept": "application/json, text/plain, */*",
            "Content-Type": "application/json;charset=UTF-8",
            "APP_VERSION": "social_app_1.0"
            }
-USER_NAME = ""
-PASSWORD = ""
+USER_NAME = "bill.li@nexa-corp.com"
+PASSWORD = "shrinlee87885537"
 LOCATION = "262adc8f-bad9-435a-8d8a-8fde521d68eb"
+
+TARGETS = ["yoga", "瑜伽"]
 
 
 def fetch_api_key():
@@ -61,19 +63,17 @@ def retrieve_events(encrypted_user_uuid):
         page += 1
 
 
-def breakfast_filter(resp):
-    # Monday
-    resp = filter(
-        lambda x: datetime.datetime.strptime(x["meta_data"]["event"]["start_date"], "%m/%d/%Y").weekday() + 1 == 1,
-        resp)
-    # AM
-    resp = filter(lambda x: x["meta_data"]["event"]["time_string"] == u' 9:00AM -  9:30AM', resp)
+def yoga_filter(resp):
+    for target in TARGETS:
+        resp = filter(lambda x: target in x["meta_data"]["event"]["name"].lower(), resp)
     return resp
 
 
 def join_event(encrypted_user_uuid, user_uuid, event):
     if user_uuid in event["meta_data"]["event"]["attending"]:
-        print "{} ==> already attended".format(event["meta_data"]["event"]["name"])
+        print "{}({}{}) ==> already attended".format(event["meta_data"]["event"]["name"],
+                                                     event["meta_data"]["event"]["start_date"],
+                                                     event["meta_data"]["event"]["time_string"])
         return
     resp = {"message": None}
     while not resp["message"]:
@@ -82,7 +82,9 @@ def join_event(encrypted_user_uuid, user_uuid, event):
             "https://membersapi.wework.com/api/v4/events/{}/rsvp".format(event["meta_data"]["event"]["uuid"]),
             data=json.dumps({}), params=params, headers=HEADERS).json()
     else:
-        print "{} ==> ordered".format(event["meta_data"]["event"]["name"])
+        print "{}({}{}) ==> ordered".format(event["meta_data"]["event"]["name"],
+                                            event["meta_data"]["event"]["start_date"],
+                                            event["meta_data"]["event"]["time_string"])
 
 
 if __name__ == '__main__':
@@ -92,6 +94,6 @@ if __name__ == '__main__':
     encrypted_user_uuid = user_info["result"]["session"]["encrypted_user_uuid"]
     user_uuid = user_info["result"]["session"]["user_uuid"]
     all_events = retrieve_events(encrypted_user_uuid)
-    breakfast_events = breakfast_filter(all_events)
+    breakfast_events = yoga_filter(all_events)
     for _event in breakfast_events:
         join_event(encrypted_user_uuid, user_uuid, _event)
