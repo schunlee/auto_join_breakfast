@@ -26,14 +26,14 @@ def fetch_api_key():
 
 
 def login():
-    session = requests.Session()
+    # session = requests.Session()
     url = "https://auth.wework.com/api/sessions"
     payload = {"api_key": fetch_api_key(),
                "include_encrypted_user_uuid": True,
                "password": PASSWORD,
                "username": USER_NAME
                }
-    resp = session.post(url, data=json.dumps(payload), headers=HEADERS)
+    resp = requests.post(url, data=json.dumps(payload), headers=HEADERS)
     if resp.status_code != 200:
         raise Exception("Login failed! - HTTP Code {}".format(resp.status_code))
     else:
@@ -71,7 +71,10 @@ def breakfast_filter(resp):
     return resp
 
 
-def join_event(encrypted_user_uuid, event):
+def join_event(encrypted_user_uuid, user_uuid, event):
+    if user_uuid in event["meta_data"]["event"]["attending"]:
+        print "{} ==> already attended".format(event["meta_data"]["event"]["name"])
+        return
     resp = {"message": None}
     while not resp["message"]:
         params = {"encrypted_user_uuid": encrypted_user_uuid}
@@ -87,7 +90,8 @@ if __name__ == '__main__':
 
     user_info = login()
     encrypted_user_uuid = user_info["result"]["session"]["encrypted_user_uuid"]
+    user_uuid = user_info["result"]["session"]["user_uuid"]
     all_events = retrieve_events(encrypted_user_uuid)
     breakfast_events = breakfast_filter(all_events)
     for _event in breakfast_events:
-        join_event(encrypted_user_uuid, _event)
+        join_event(encrypted_user_uuid, user_uuid, _event)
