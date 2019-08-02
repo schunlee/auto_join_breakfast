@@ -21,8 +21,11 @@ LOCATION = "262adc8f-bad9-435a-8d8a-8fde521d68eb"
 
 
 def fetch_api_key():
-    resp = requests.get("https://membersapi.wework.com/api/v10/login/key", headers=HEADERS).json()
-    return resp["result"]["api_key"]
+    try:
+        resp = requests.get("https://membersapi.wework.com/api/v10/login/key", headers=HEADERS).json()
+        return resp["result"]["api_key"]
+    except Exception, msg:
+        return "7d8f169aaa"
 
 
 def login():
@@ -67,7 +70,7 @@ def breakfast_filter(resp):
         lambda x: datetime.datetime.strptime(x["meta_data"]["event"]["start_date"], "%m/%d/%Y").weekday() + 1 == 1,
         resp)
     # AM
-    resp = filter(lambda x: x["meta_data"]["event"]["time_string"] == u' 9:00AM -  9:30AM', resp)
+    resp = filter(lambda x: "9:00AM" in x["meta_data"]["event"]["time_string"], resp)
     return resp
 
 
